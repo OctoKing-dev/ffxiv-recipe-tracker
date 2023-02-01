@@ -121,3 +121,84 @@ function updateRecipeElement(recipe) {
 function updateRecipe(recipe) {
   updateRecipeElement(recipe);
 }
+
+let newMaterials = [];
+
+const newMaterialName = document.getElementById("newMaterialName"),
+  newMaterialCount = document.getElementById("newMaterialCount"),
+  newMaterialMultiplier = document.getElementById("newMaterialMultiplier"),
+  newMaterialClass = document.getElementById("newMaterialClass"),
+  newMaterialLocation = document.getElementById("newMaterialLocation"),
+  newMaterialTime = document.getElementById("newMaterialTime");
+
+const addMaterialButton = document.getElementById("addMaterial");
+/** Adds new material to the new recipe being worked on, based on values entered. */
+function addNewMaterial() {
+  const newMaterial = {};
+  newMaterial.Name = newMaterialName.value || "";
+  if (newMaterial.Name === "") { return; } // Can't have nameless Materials.
+  newMaterial.Count = Number.parseInt(newMaterialCount.value) || 1;
+  newMaterial.Multiplier = Number.parseInt(newMaterialMultiplier.value) || 1;
+  newMaterial.CraftCount = Math.ceil(newMaterial.Count/newMaterial.Multiplier);
+  newMaterial.Class = newMaterialClass.value;
+  newMaterial.Materials = [];
+  newMaterial.Location = newMaterialLocation.value;
+  newMaterial.Time = newMaterialTime.value;
+
+  for (const material of Materials) {
+    // On match, assume we just want more of the same Material without updating.
+    // This allows us to add more of a Material simply by entering its Name and Count.
+    // Kind of like a ghetto autofill, really.
+    if (newMaterial.Name === material.Name) {
+      newMaterial.Multiplier = material.Multiplier;
+      newMaterial.CraftCount = Math.ceil(newMaterial.Count/newMaterial.Multiplier);
+      newMaterial.Class = material.Class;
+      newMaterial.Location = material.Location;
+      newMaterial.Time = material.Time;
+    }
+    console.log("Preexisting Material entered!");
+    console.log(newMaterial);
+  }
+
+  for (const material of newMaterials) {
+    // Update on matches. Assume they meant to make a correction to the New Material.
+    if (newMaterial.Name === material.Name) {
+      material.Count = newMaterial.Count;
+      material.Multiplier = newMaterial.Multiplier;
+      material.CraftCount = newMaterial.CraftCount;
+      material.Class = newMaterial.Class;
+      material.Location = newMaterial.Location;
+      material.Time = newMaterialTime.Time;
+
+      console.log(newMaterial);
+      return;
+    }
+  }
+
+  newMaterials.push(newMaterial);
+  console.log(newMaterial);
+
+  // Create New Material List entry from template
+  const materialTemplate = document.getElementById("newMaterialTemplate");
+  const newMaterialTemplate = materialTemplate.content.firstElementChild.cloneNode(true);
+
+  const templateFields = newMaterialTemplate.querySelectorAll(".material-field");
+  // Count
+  templateFields[0].textContent = newMaterial.Count+"x";
+  // Name
+  templateFields[1].textContent = newMaterial.Name;
+  // Multiplier
+  templateFields[2].textContent = "("+newMaterial.Multiplier+"x/Craft)";
+  if (newMaterial.Multiplier === 1) {
+    templateFields[2].style.display = "none";
+  }
+  // Class
+  templateFields[3].textContent = newMaterial.Class;
+  // Location
+  templateFields[4].textContent = newMaterial.Location;
+  // Time
+  templateFields[5].textContent = newMaterial.Time;
+
+  document.getElementById("newMaterialList").append(newMaterialTemplate);
+}
+addMaterialButton.addEventListener('click', addNewMaterial);

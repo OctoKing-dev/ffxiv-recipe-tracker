@@ -96,9 +96,22 @@
             <input type="time" id="newMaterialTime" name="newMaterialTime">
           </div>
         </div>
-        <ol id="newMaterialList" class="container material-list">
+        <div id="newMaterialList" class="container material-list">
           
-        </ol>
+        </div>
+        <template id="newMaterialTemplate">
+          <div class="container material-item new-material">
+            <span class="material-count material-field">1x</span>
+            <span class="material-name material-field">EXAMPLE</span>
+            <span class="material-multiplier material-field">(3x/Craft)</span>
+            <span class="material-class material-field">CRP</span>
+            <span class="material-location material-field">Limsa Lominsa</span>
+            <span class="material-time material-field">16:00</span>
+            <div class="buttons">
+              <button type="button" class="remove-button">Remove</button>
+            </div>
+          </div>
+        </template>
       </div>
       <div class="buttons">
         <button type="button" id="addRecipe">+ Add</button>

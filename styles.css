@@ -68,7 +68,8 @@ main {
   text-align: center;
 }
 
-.recipe-onhand {
+.recipe-onhand, 
+.material-onhand {
   display: flex;
   align-items: center;
   gap: 4px;  
