@@ -98,6 +98,7 @@ function onRemoveRecipe(event) {
 }
 
 function updateRecipeElement(recipe) {
+  if (!recipe.Element) { return; }
   const recipeFields = recipe.Element.querySelectorAll(".recipe-field");
   // Count
   recipeFields[0].textContent = recipe.Count+"x";
@@ -232,6 +233,7 @@ function clearNewMaterials() {
 }
 
 function updateNewMaterialElement(newMaterial) {
+  if (!newMaterial.Element) { return; }
   const newMaterialFields = newMaterial.Element.querySelectorAll(".material-field");
   // Count
   newMaterialFields[0].textContent = newMaterial.Count+"x";
