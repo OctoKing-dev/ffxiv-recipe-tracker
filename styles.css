@@ -13,19 +13,41 @@ footer {
 
 main {
   display: flex;
+  flex-flow: row wrap;
   gap: 8px;
   padding: 8px;
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
   border: 1px solid black;
+}
+
+.control-panel {
+  flex-basis: 100%;
+  padding: 16px;
 }
 
 .materials {
   flex: 3;
 }
 
+.recipe-controls,
+.material-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  border: none;
+}
+
 .recipes, 
 .timers {
   flex: 1;
+}
+
+#closePanel {
+  height: 24px;
+  width: 24px;
 }

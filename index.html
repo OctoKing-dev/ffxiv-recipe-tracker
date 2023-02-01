@@ -12,6 +12,87 @@
     <h1>FFXIV Recipe Tracker</h1>
   </header>
   <main>
+    <div class="container control-panel">
+      <button type="button" id="closePanel">X</button>
+      <h1>Add Recipe</h1>
+      <div class="container recipe-controls">
+        <div class="input-group">
+          <label for="newRecipeName">Name</label>
+          <input type="text" id="newRecipeName" name="newRecipeName" required>
+        </div>
+        <div class="input-group">
+          <label for="newRecipeCount">Count</label>
+          <input type="number" id="newRecipeCount" name="newRecipeCount" value="1" min="1" max="9999" required>
+        </div>
+        <div class="input-group">
+          <label for="newRecipeMultiplier"># per Craft</label>
+          <input type="number" id="newRecipeMultiplier" name="newRecipeMultiplier" value="1" min="1" max="999" required>
+        </div>
+        <div class="input-group">
+          <label for="newRecipeClass">Class</label>
+          <select id="newRecipeClass" name="newRecipeClass">
+            <option value="">---</option>
+            <option value="CRP">CRP</option>
+            <option value="BSM">BSM</option>
+            <option value="ARM">ARM</option>
+            <option value="GSM">GSM</option>
+            <option value="LTW">LTW</option>
+            <option value="WVR">WVR</option>
+            <option value="ALC">ALC</option>
+            <option value="CUL">CUL</option>
+            <option value="MIN">MIN</option>
+            <option value="BTN">BTN</option>
+            <option value="FSH">FSH</option>
+          </select>
+        </div>
+      </div>
+      <h2>Materials</h2>
+      <div class="container">
+        <div class="container material-controls">
+          <button type="button">+ Add</button>
+          <div class="input-group">
+            <label for="newMaterialName">Name</label>
+            <input type="text" id="newMaterialName" name="newMaterialName" required>
+          </div>
+          <div class="input-group">
+            <label for="newMaterialCount">Count</label>
+            <input type="number" id="newMaterialCount" name="newMaterialCount" value="1" min="1" max="9999" required>
+          </div>
+          <div class="input-group">
+            <label for="newMaterialMultiplier"># per Craft</label>
+            <input type="number" id="newMaterialMultiplier" name="newMaterialMultiplier" value="1" min="1" max="999" required>
+          </div>
+          <div class="input-group">
+            <label for="newMaterialClass">Class</label>
+            <select id="newMaterialClass" name="newMaterialClass">
+              <option value="">---</option>
+              <option value="CRP">CRP</option>
+              <option value="BSM">BSM</option>
+              <option value="ARM">ARM</option>
+              <option value="GSM">GSM</option>
+              <option value="LTW">LTW</option>
+              <option value="WVR">WVR</option>
+              <option value="ALC">ALC</option>
+              <option value="CUL">CUL</option>
+              <option value="MIN">MIN</option>
+              <option value="BTN">BTN</option>
+              <option value="FSH">FSH</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="newMaterialLocation">Location</label>
+            <input type="text" id="newMaterialLocation" name="newMaterialLocation">
+          </div>
+          <div class="input-group">
+            <label for="newMaterialTime">Time</label>
+            <input type="time" id="newMaterialTime" name="newMaterialTime">
+          </div>
+        </div>
+        <ol id="newMaterialList" class="container material-list">
+          
+        </ol>
+      </div>
+    </div>
     <div class="container timers">
       <h1>Timed Nodes</h1>
       <ol id="timerList" class="container timer-list">
