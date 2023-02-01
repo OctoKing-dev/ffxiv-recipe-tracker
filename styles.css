@@ -37,6 +37,17 @@ main {
   flex: 3;
 }
 
+.recipe-item {
+  gap: 8px;
+  padding: 8px;
+}
+
+.recipe-item .buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .recipe-controls,
 .material-controls {
   display: flex;
@@ -44,6 +55,23 @@ main {
   align-items: center;
   gap: 16px;
   border: none;
+}
+
+.recipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipe-name {
+  margin: 0;
+  text-align: center;
+}
+
+.recipe-onhand {
+  display: flex;
+  align-items: center;
+  gap: 4px;  
 }
 
 .recipes, 
