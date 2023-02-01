@@ -177,9 +177,10 @@ function addNewMaterial() {
       material.CraftCount = newMaterial.CraftCount;
       material.Class = newMaterial.Class;
       material.Location = newMaterial.Location;
-      material.Time = newMaterialTime.Time;
+      material.Time = newMaterial.Time;
 
       console.log(newMaterial);
+      updateNewMaterialElement(material);
       clearMaterialInput();
       return;
     }
@@ -209,8 +210,28 @@ function addNewMaterial() {
   // Time
   templateFields[5].textContent = newMaterial.Time;
 
+  // Save a reference to our new Element
+  newMaterial.Element = newMaterialTemplate;
+
   document.getElementById("newMaterialList").append(newMaterialTemplate);
 
   clearMaterialInput();
 }
 addMaterialButton.addEventListener('click', addNewMaterial);
+
+function updateNewMaterialElement(newMaterial) {
+  const newMaterialFields = newMaterial.Element.querySelectorAll(".material-field");
+  // Count
+  newMaterialFields[0].textContent = newMaterial.Count+"x";
+  // Name
+  newMaterialFields[1].textContent = newMaterial.Name || "<CUSTOM>";
+  // Multiplier
+  newMaterialFields[2].style.display = newMaterial.Multiplier === 1 ? "none" : "block";
+  newMaterialFields[2].textContent = "("+newMaterial.Multiplier+"x/Craft)";
+  // Class
+  newMaterialFields[3].textContent = newMaterial.Class;
+  // Location
+  newMaterialFields[4].textContent = newMaterial.Location;
+  // Time
+  newMaterialFields[5].textContent = newMaterial.Time;
+}
