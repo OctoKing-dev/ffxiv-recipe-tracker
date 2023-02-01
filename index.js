@@ -249,3 +249,11 @@ function updateNewMaterialElement(newMaterial) {
   // Time
   newMaterialFields[5].textContent = newMaterial.Time;
 }
+
+const addRecipePanel = document.getElementById("addRecipePanel");
+document.getElementById("closePanel").addEventListener('click', (event) => {
+  addRecipePanel.style.display = "none";
+});
+document.getElementById("addRecipe2").addEventListener('click', (event) => {
+  addRecipePanel.style.display = "block";
+})
