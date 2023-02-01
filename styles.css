@@ -33,6 +33,17 @@ main {
   margin-top: 16px;
 }
 
+.material-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.material-item .buttons {
+  margin-top: 0px;
+}
+
 .materials {
   flex: 3;
 }
