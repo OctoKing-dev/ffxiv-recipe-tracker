@@ -63,6 +63,8 @@ function addRecipe() {
   document.getElementById("recipeList").appendChild(newRecipeTemplate);
 
   clearRecipeInput();
+  clearMaterialInput();
+  clearNewMaterials();
 }
 addRecipeButton.addEventListener('click', addRecipe);
 
@@ -218,6 +220,16 @@ function addNewMaterial() {
   clearMaterialInput();
 }
 addMaterialButton.addEventListener('click', addNewMaterial);
+
+function clearNewMaterials() {
+  for (const newMaterial of newMaterials) {
+    if (newMaterial.Element) {
+      newMaterial.Element.remove();
+      newMaterial.Element = null;
+    }
+  }
+  newMaterials = [];
+}
 
 function updateNewMaterialElement(newMaterial) {
   const newMaterialFields = newMaterial.Element.querySelectorAll(".material-field");
