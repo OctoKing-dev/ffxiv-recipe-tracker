@@ -131,6 +131,15 @@ const newMaterialName = document.getElementById("newMaterialName"),
   newMaterialLocation = document.getElementById("newMaterialLocation"),
   newMaterialTime = document.getElementById("newMaterialTime");
 
+function clearMaterialInput() {
+  newMaterialName.value = "";
+  newMaterialCount.value = "1";
+  newMaterialMultiplier.value = "1";
+  newMaterialClass.value = "";
+  newMaterialLocation.value = "";
+  newMaterialTime.value = "";
+}
+
 const addMaterialButton = document.getElementById("addMaterial");
 /** Adds new material to the new recipe being worked on, based on values entered. */
 function addNewMaterial() {
@@ -171,6 +180,7 @@ function addNewMaterial() {
       material.Time = newMaterialTime.Time;
 
       console.log(newMaterial);
+      clearMaterialInput();
       return;
     }
   }
@@ -200,5 +210,7 @@ function addNewMaterial() {
   templateFields[5].textContent = newMaterial.Time;
 
   document.getElementById("newMaterialList").append(newMaterialTemplate);
+
+  clearMaterialInput();
 }
 addMaterialButton.addEventListener('click', addNewMaterial);
