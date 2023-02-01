@@ -29,6 +29,10 @@ main {
   padding: 16px;
 }
 
+.control-panel .buttons {
+  margin-top: 16px;
+}
+
 .materials {
   flex: 3;
 }
@@ -45,6 +49,10 @@ main {
 .recipes, 
 .timers {
   flex: 1;
+}
+
+#addRecipe {
+  font-size: 18px;
 }
 
 #closePanel {
