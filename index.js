@@ -46,6 +46,7 @@ class Recipe {
   }
   set name(newName) {
     this.#name = newName || "";
+    this.updateElement();
   }
 
   get count() {
@@ -131,8 +132,8 @@ class Recipe {
     }
 
     for (const materialArray of this.#materials) {
-      //const adjustBy = materialArray[1] * difference;
-      //materialArray[0].recipeAdjustCount(adjustBy);
+      const adjustBy = materialArray[1] * difference;
+      materialArray[0].recipeAdjustCount(adjustBy);
     }
 
     this.#craftCount = newCraftCount;
@@ -183,14 +184,33 @@ class Recipe {
     const haveInput = this.#element.querySelector(".recipe-have");
     haveInput.value = this.#completed;
   }
+
+  addMaterial(newMaterial, amountPerCraft = 1) {
+    if (!newMaterial || amountPerCraft < 1) { return; }
+    for (const material of this.#materials) {
+      if (material[0] === newMaterial) {
+        console.warn("Recipe: Attempted to add duplicate Material to list!");
+        return;
+      }
+    }
+    
+    const newMaterialArray = [
+      newMaterial,
+      amountPerCraft
+    ];
+    this.#materials.push(newMaterialArray);
+
+    newMaterial.recipeAdjustCount(this.#craftCount * amountPerCraft);
+  }
 }
 
 class Material {
   #name = "";
-  #count = 1;
+  #count = 0;
   #completed = 0;
   #craftClass = "";
-  #craftCount = "";
+  #craftCount = 0;
+  #craftCountTotal = 0;
   #location = "";
   #materials = [];
   #multiplier = 1;
@@ -198,11 +218,16 @@ class Material {
   #timeAMPM = false;
   #element = null;
 
-  constructor(name) {
+  constructor(name, multiplier = 1, craftClass = "", location = "", time = "", timeAMPM = false) {
     if (!name || name === "") {
       error("Material: Attempted to create Material with invalid or blank name!");
     }
-    this.#name = name;
+    this.#name = name.toString();
+    this.#multiplier = (multiplier > 0) ? multiplier : 1;
+    this.#craftClass = craftClass.toString();
+    this.#location = location.toString();
+    this.#time = time.toString();
+    this.#timeAMPM = (timeAMPM == true);
   }
 
   get name() {
@@ -212,7 +237,8 @@ class Material {
     if (!newName || newName === "") {
       error("Material: Attempted to set invalid or blank name!");
     } 
-    this.#name = newName;
+    this.#name = newName.toString();
+    this.updateElement();
   }
 
   get count() {
@@ -250,6 +276,74 @@ class Material {
   get timeAMPM() {
     return this.#timeAMPM;
   }
+
+  calculateCraftCount() {
+    return Math.max(Math.ceil((this.#count - this.#completed)/this.#multiplier), 0);
+  }
+
+  calculateCraftCountTotal() {
+    return Math.ceil(this.#count/this.#multiplier);
+  }
+
+  updateCraftCount() {
+    console.log("Updating");
+    const lastCraftCount = this.#craftCount,
+      lastCraftCountTotal = this.#craftCountTotal;
+    
+    const newCraftCount = this.calculateCraftCount();
+    const newCraftCountTotal = this.calculateCraftCountTotal();
+
+    const difference = newCraftCount - lastCraftCount;
+
+    if (difference === 0) {
+      if (newCraftCountTotal === lastCraftCountTotal) {
+        this.updateElement();
+        return;
+      }
+      this.#craftCountTotal = newCraftCountTotal;
+      this.updateElement();
+      return;
+    }
+
+    for (const materialArray of this.#materials) {
+      const adjustBy = materialArray[1] * difference;
+      materialArray[0].recipeAdjustCount(adjustBy);
+    }
+
+    this.#craftCount = newCraftCount;
+    this.#craftCountTotal = newCraftCountTotal;
+    
+    this.updateElement();
+  }
+
+  updateElement() {
+    if (!this.#element) {
+      return;
+    }
+  }
+
+  addMaterial(newMaterial, amountPerCraft = 1) {
+    if (!newMaterial || amountPerCraft < 1) { return; }
+    for (const material of this.#materials) {
+      if (material[0] === newMaterial) {
+        console.warn("Material: Attempted to add duplicate Material to list!");
+        return;
+      }
+    }
+    
+    const newMaterialArray = [
+      newMaterial,
+      amountPerCraft
+    ];
+    this.#materials.push(newMaterialArray);
+
+    newMaterial.recipeAdjustCount(this.#craftCount * amountPerCraft);
+  }
+
+  recipeAdjustCount(amount) {
+    this.#count = Math.max(0, this.#count + amount);
+    this.updateCraftCount();
+  }
 }
 
 
@@ -270,6 +364,11 @@ function addRecipe() {
   const newRecipe = new Recipe(newRecipeName.value, (Number.parseInt(newRecipeCount.value) || 1), Number.parseInt(newRecipeMultiplier.value), newRecipeClass.value);
   
   Recipes.push(newRecipe);
+
+  for (const newMaterial of newMaterials) {
+    const material = createMaterialFromNewMaterial(newMaterial);
+    newRecipe.addMaterial(material, newMaterial.Count);
+  }
 
   newRecipe.createElement();
 
@@ -308,6 +407,24 @@ function removeRecipeByElement(recipeElement) {
 function onRemoveRecipe(event) {
   if (!event || !event.target) { return; }
   removeRecipeByElement(event.target.parentNode.parentNode);
+}
+
+function createMaterialFromNewMaterial(newMaterial) {
+  for (const material of Materials) {
+    if (newMaterial.Name === material.name) {
+      console.log("Preexisting Material entered!:", material);
+      return material;
+    }
+  }
+
+  // Create a new Material
+  const material = new Material(newMaterial.Name, newMaterial.Multiplier, newMaterial.Class, newMaterial.Location, newMaterial.Time);
+  //material.createElement();
+  Materials.push(material);
+
+  console.log(material);
+
+  return material;
 }
 
 let newMaterials = [];
@@ -352,9 +469,9 @@ function addNewMaterial() {
       newMaterial.Class = material.Class;
       newMaterial.Location = material.Location;
       newMaterial.Time = material.Time;
+      console.log("Preexisting Material entered!");
+      console.log(newMaterial);
     }
-    console.log("Preexisting Material entered!");
-    console.log(newMaterial);
   }
 
   for (const material of newMaterials) {
