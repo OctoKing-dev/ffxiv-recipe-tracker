@@ -33,14 +33,19 @@ main {
   margin-top: 16px;
 }
 
-.material-item {
+.material-item, 
+.new-material-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 16px;
 }
 
-.material-item .buttons {
+.material-item {
+  padding: 8px;
+}
+
+.new-material-item .buttons {
   margin-top: 0px;
 }
 
