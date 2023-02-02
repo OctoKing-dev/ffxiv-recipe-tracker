@@ -453,7 +453,6 @@ function addNewMaterial() {
   if (newMaterial.Name === "") { return; } // Can't have nameless Materials.
   newMaterial.Count = Number.parseInt(newMaterialCount.value) || 1;
   newMaterial.Multiplier = Number.parseInt(newMaterialMultiplier.value) || 1;
-  newMaterial.CraftCount = Math.ceil(newMaterial.Count/newMaterial.Multiplier);
   newMaterial.Class = newMaterialClass.value;
   newMaterial.Materials = [];
   newMaterial.Location = newMaterialLocation.value;
@@ -463,12 +462,11 @@ function addNewMaterial() {
     // On match, assume we just want more of the same Material without updating.
     // This allows us to add more of a Material simply by entering its Name and Count.
     // Kind of like a ghetto autofill, really.
-    if (newMaterial.Name === material.Name) {
-      newMaterial.Multiplier = material.Multiplier;
-      newMaterial.CraftCount = Math.ceil(newMaterial.Count/newMaterial.Multiplier);
-      newMaterial.Class = material.Class;
-      newMaterial.Location = material.Location;
-      newMaterial.Time = material.Time;
+    if (newMaterial.Name === material.name) {
+      newMaterial.Multiplier = material.multiplier;
+      newMaterial.Class = material.craftClass;
+      newMaterial.Location = material.location;
+      newMaterial.Time = material.time;
       console.log("Preexisting Material entered!");
       console.log(newMaterial);
     }
@@ -479,7 +477,6 @@ function addNewMaterial() {
     if (newMaterial.Name === material.Name) {
       material.Count = newMaterial.Count;
       material.Multiplier = newMaterial.Multiplier;
-      material.CraftCount = newMaterial.CraftCount;
       material.Class = newMaterial.Class;
       material.Location = newMaterial.Location;
       material.Time = newMaterial.Time;
