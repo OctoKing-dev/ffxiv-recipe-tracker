@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FFXIV Recipe Tracker</title>
-  <link rel='stylesheet' href='styles.css'/>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -122,23 +122,45 @@
     </div>
     <div class="container timers">
       <h1>Timed Nodes</h1>
-      <ol id="timerList" class="container timer-list">
+      <div id="timerList" class="container timer-list">
 
-      </ol>
+      </div>
+      <template id="timedMaterialTemplate">
+        <div class="container material-item">
+          <span class="material-name material-field">EXAMPLE</span>
+          <span class="material-class material-field">CRP</span>
+          <span class="material-location material-field">Limsa Lominsa</span>
+          <span class="material-time material-field">16:00</span>
+        </div>        
+      </template>
     </div>
     <div class="container materials">
       <div class="container">
         <h1>Materials</h1>
-        <ol id="materialList" class="container material-list">
+        <div id="materialList" class="container material-list">
           
-        </ol>
+        </div>
       </div>
       <div class="container">
         <h2>Raw Materials</h2>
-        <ol id="rawMaterialList" class="container material-list">
+        <div id="rawMaterialList" class="container material-list">
           
-        </ol>
+        </div>
       </div>
+      <template id="materialTemplate">
+        <div class="container material-item">
+          <span class="material-count material-field">1x</span>
+          <span class="material-name material-field">EXAMPLE</span>
+          <span class="material-multiplier material-field">(3x/Craft)</span>
+          <span class="material-class material-field">CRP</span>
+          <span class="material-location material-field">Limsa Lominsa</span>
+          <span class="material-time material-field">16:00</span>
+          <span class="material-completion material-field">(0/1)</span>
+          <div class="buttons">
+            <label class="material-onhand">Have<input type="number" class="material-have" value="0" min="0" max="9999" required></label>
+          </div>
+        </div>
+      </template>
     </div>
     <div class="container recipes">
       <div class="buttons">
@@ -167,6 +189,6 @@
   </main>
   <footer>Made by <a href="https://na.finalfantasyxiv.com/lodestone/character/15723917/">Moonymer Turron</a> on Midgardsormr</footer>
   
-  <script type="text/javascript" src="index.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>

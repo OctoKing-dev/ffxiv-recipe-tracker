@@ -217,6 +217,7 @@ class Material {
   #time = "";
   #timeAMPM = false;
   #element = null;
+  #timeElement = null;
 
   constructor(name, multiplier = 1, craftClass = "", location = "", time = "", timeAMPM = false) {
     if (!name || name === "") {
@@ -248,6 +249,10 @@ class Material {
   get completed() {
     return this.#completed;
   }
+  set completed(value) {
+    this.#completed = (value && value >= 0) ? value : 0;
+    this.updateCraftCount();
+  }
 
   get craftClass() {
     return this.#craftClass;
@@ -255,6 +260,21 @@ class Material {
 
   get craftCount() {
     return this.#craftCount;
+  }
+
+  get element() {
+    return this.#element;
+  }
+  set element(newElement) {
+    if (this.#element && this.#element != newElement) {
+      this.#element.remove();
+    }
+    this.#element = newElement;
+    this.updateElement();
+  }
+
+  get timeElement() {
+    return this.#timeElement;
   }
   
   get location() {
@@ -316,10 +336,48 @@ class Material {
     this.updateElement();
   }
 
+  createElement() {
+    if (this.#element) {
+      this.#element.remove();
+      this.#element = null;
+    }
+
+    // Create Material List entry from template
+    const materialTemplate = document.getElementById("materialTemplate");
+    const newMaterialTemplate = materialTemplate.content.firstElementChild.cloneNode(true);
+
+    this.element = newMaterialTemplate;
+
+    const haveInput = newMaterialTemplate.querySelector(".material-have");
+    haveInput.addEventListener('change', (event) => { 
+      this.completed = Number.parseInt(event.target.value) || 0;
+    });
+  }
+
   updateElement() {
     if (!this.#element) {
       return;
     }
+    const fields = this.#element.querySelectorAll(".material-field");
+    // Count
+    fields[0].textContent = this.#count+"x";
+    // Name
+    fields[1].textContent = this.#name;
+    // Multiplier
+    fields[2].style.display = (this.#multiplier === 1) ? "none" : "block";
+    fields[2].textContent = "("+this.#multiplier+"x/Craft)";
+    // Class
+    fields[3].textContent = this.#craftClass;
+    // Location
+    fields[4].textContent = this.#location;
+    // Time
+    fields[5].textContent = this.#time;
+    // Completion
+    fields[6].textContent = "("+Math.floor(this.#completed/this.#multiplier)+"/"+this.#craftCountTotal+")";
+
+    // Have
+    const haveInput = this.#element.querySelector(".material-have");
+    haveInput.value = this.#completed;
   }
 
   addMaterial(newMaterial, amountPerCraft = 1) {
@@ -419,10 +477,13 @@ function createMaterialFromNewMaterial(newMaterial) {
 
   // Create a new Material
   const material = new Material(newMaterial.Name, newMaterial.Multiplier, newMaterial.Class, newMaterial.Location, newMaterial.Time);
-  //material.createElement();
+  material.createElement();
+
   Materials.push(material);
 
   console.log(material);
+
+  document.getElementById("materialList").appendChild(material.element);
 
   return material;
 }
