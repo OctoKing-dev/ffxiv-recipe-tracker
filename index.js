@@ -519,7 +519,11 @@ function createMaterialFromNewMaterial(newMaterial) {
 
   console.log(material);
 
-  document.getElementById("materialList").appendChild(material.element);
+  if (material.materials.length > 0) {
+    document.getElementById("materialList").appendChild(material.element);
+  } else {
+    document.getElementById("rawMaterialList").appendChild(material.element);
+  }
 
   if (material.timeElement) {
     document.getElementById("timerList").appendChild(material.timeElement);
