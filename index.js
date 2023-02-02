@@ -1,14 +1,45 @@
 const Recipes = [];
 const Materials = [];
 
+function getMaterialByName(name) {
+  for (const material of Materials) {
+    if (material.name === name) {
+      return material;
+    }
+  }
+  return null;
+}
+
 class Recipe {
   #name = "";
   #count = 1;
   #completed = 0;
   #craftClass = "";
   #craftCount = 1;
+  #craftCountTotal = 1;
   #materials = [];
   #multiplier = 1;
+  #element = null;
+
+  constructor(name = "", count = 1, multiplier = 1, craftClass = "") {
+    this.#name = name.toString();
+    this.#count = (count >= 0) ? count : 1;
+    this.#multiplier = (multiplier > 0) ? multiplier : 1;
+    this.#craftClass = craftClass.toString();
+
+    this.#craftCount = this.calculateCraftCount();
+    this.#craftCountTotal = this.calculateCraftCountTotal();
+  }
+
+  destroy() {
+    if (this.#element) {
+      this.#element.remove();
+      this.#element = null;
+    }
+    this.#count = 0;
+    this.#completed = 0;
+    this.updateCraftCount();
+  }
 
   get name() {
     return this.#name;
@@ -20,17 +51,43 @@ class Recipe {
   get count() {
     return this.#count;
   }
+  set count(value) {
+    this.#count = (value && value > 0) ? value : 1;
+    this.updateCraftCount();
+  }
   
   get completed() {
     return this.#completed;
   }
+  set completed(value) {
+    this.#completed = (value && value >= 0) ? value : 0;
+    this.updateCraftCount();
+  }
 
-  get class() {
+  get craftClass() {
     return this.#craftClass;
+  }
+  set craftClass(value) {
+    this.#craftClass = value || "";
   }
 
   get craftCount() {
     return this.#craftCount;
+  }
+
+  get craftCountTotal() {
+    return this.#craftCountTotal
+  }
+
+  get element() {
+    return this.#element;
+  }
+  set element(newElement) {
+    if (this.#element && this.#element != newElement) {
+      this.#element.remove();
+    }
+    this.#element = newElement;
+    this.updateElement();
   }
 
   get materials() {
@@ -39,6 +96,92 @@ class Recipe {
 
   get multiplier() {
     return this.#multiplier;
+  }
+  set multiplier(value) {
+    this.#multiplier = (value && value > 0) ? value : 1;
+    this.updateCraftCount();
+  }
+
+  calculateCraftCount() {
+    return Math.max(Math.ceil((this.#count - this.#completed)/this.#multiplier), 0);
+  }
+
+  calculateCraftCountTotal() {
+    return Math.ceil(this.#count/this.#multiplier);
+  }
+
+  updateCraftCount() {
+    console.log("Updating");
+    const lastCraftCount = this.#craftCount,
+      lastCraftCountTotal = this.#craftCountTotal;
+    
+    const newCraftCount = this.calculateCraftCount();
+    const newCraftCountTotal = this.calculateCraftCountTotal();
+
+    const difference = newCraftCount - lastCraftCount;
+
+    if (difference === 0) {
+      if (newCraftCountTotal === lastCraftCountTotal) {
+        this.updateElement();
+        return;
+      }
+      this.#craftCountTotal = newCraftCountTotal;
+      this.updateElement();
+      return;
+    }
+
+    for (const materialArray of this.#materials) {
+      //const adjustBy = materialArray[1] * difference;
+      //materialArray[0].recipeAdjustCount(adjustBy);
+    }
+
+    this.#craftCount = newCraftCount;
+    this.#craftCountTotal = newCraftCountTotal;
+    
+    this.updateElement();
+  }
+
+  createElement() {
+    if (this.#element) {
+      this.#element.remove();
+      this.#element = null;
+    }
+
+    // Create Recipe List entry from template
+    const recipeTemplate = document.getElementById("recipeTemplate");
+    const newRecipeTemplate = recipeTemplate.content.firstElementChild.cloneNode(true);
+
+    this.element = newRecipeTemplate;
+
+    const removeButton = newRecipeTemplate.querySelector(".remove-button");
+    removeButton.addEventListener('click', onRemoveRecipe);
+
+    const haveInput = newRecipeTemplate.querySelector(".recipe-have");
+    haveInput.addEventListener('change', (event) => { 
+      this.completed = Number.parseInt(event.target.value) || 0;
+    });
+  }
+
+  updateElement() {
+    if (!this.#element) {
+      return;
+    }
+    const fields = this.#element.querySelectorAll(".recipe-field");
+    // Count
+    fields[0].textContent = this.#count+"x";
+    // Name
+    fields[1].textContent = this.#name || "<CUSTOM>";
+    // Completion
+    fields[2].textContent = "("+Math.floor(this.#completed/this.#multiplier)+"/"+this.#craftCountTotal+")";
+    // Multiplier
+    fields[3].style.display = (this.#multiplier === 1) ? "none" : "block";
+    fields[3].textContent = "("+this.#multiplier+"x/Craft)";
+    // Class
+    fields[4].textContent = this.#craftClass;
+
+    // Have
+    const haveInput = this.#element.querySelector(".recipe-have");
+    haveInput.value = this.#completed;
   }
 }
 
@@ -49,9 +192,11 @@ class Material {
   #craftClass = "";
   #craftCount = "";
   #location = "";
+  #materials = [];
   #multiplier = 1;
   #time = "";
   #timeAMPM = false;
+  #element = null;
 
   constructor(name) {
     if (!name || name === "") {
@@ -122,51 +267,15 @@ function clearRecipeInput() {
 
 const addRecipeButton = document.getElementById("addRecipe");
 function addRecipe() {
-  const newRecipe = {};
-  newRecipe.Name = newRecipeName.value || "";
-  newRecipe.Count = Number.parseInt(newRecipeCount.value) || 1;
-  newRecipe.Completed = 0;
-  newRecipe.Multiplier = Number.parseInt(newRecipeMultiplier.value) || 1;
-  newRecipe.CraftCount = Math.ceil(newRecipe.Count/newRecipe.Multiplier);
-  newRecipe.Class = newRecipeClass.value;
-  newRecipe.Materials = [];
-
-  console.log(newRecipe);
+  const newRecipe = new Recipe(newRecipeName.value, (Number.parseInt(newRecipeCount.value) || 1), Number.parseInt(newRecipeMultiplier.value), newRecipeClass.value);
+  
   Recipes.push(newRecipe);
 
-  // Create Recipe List entry from template
-  const recipeTemplate = document.getElementById("recipeTemplate");
-  const newRecipeTemplate = recipeTemplate.content.firstElementChild.cloneNode(true);
+  newRecipe.createElement();
 
-  const templateFields = newRecipeTemplate.querySelectorAll(".recipe-field");
-  console.log(templateFields);
-  // Count
-  templateFields[0].textContent = newRecipe.Count+"x";
-  // Name
-  templateFields[1].textContent = newRecipe.Name || "<CUSTOM>";
-  // Completion
-  templateFields[2].textContent = "("+Math.floor(newRecipe.Completed/newRecipe.Multiplier)+"/"+newRecipe.CraftCount+")";
-  // Multiplier
-  if (newRecipe.Multiplier === 1) {
-    templateFields[3].style.display = "none";
-  }
-  templateFields[3].textContent = "("+newRecipe.Multiplier+"x/Craft)";
-  // Class
-  templateFields[4].textContent = newRecipe.Class;
+  console.log(newRecipe);
 
-  const removeButton = newRecipeTemplate.querySelector(".remove-button");
-  removeButton.addEventListener('click', onRemoveRecipe);
-
-  const haveInput = newRecipeTemplate.querySelector(".recipe-have");
-  haveInput.addEventListener('change', (event) => { 
-    newRecipe.Completed = Number.parseInt(event.target.value) || 0;
-    updateRecipe(newRecipe); 
-  })
-
-  // Save a reference to our new Element
-  newRecipe.Element = newRecipeTemplate;
-
-  document.getElementById("recipeList").appendChild(newRecipeTemplate);
+  document.getElementById("recipeList").appendChild(newRecipe.element);
 
   clearRecipeInput();
   clearMaterialInput();
@@ -179,10 +288,8 @@ function removeRecipe(recipe) {
     const thisRecipe = Recipes[i];
     if (thisRecipe == recipe) {
       Recipes.splice(i, 1);
-      if (thisRecipe.Element) {
-        thisRecipe.Element.remove();
-        thisRecipe.Element = null;
-      }
+      recipe.destroy();
+      break;
     }
   }
 }
@@ -191,7 +298,7 @@ function removeRecipeByElement(recipeElement) {
   if (!recipeElement) { return; }
   for (const thisRecipe of Recipes) {
     console.log(thisRecipe);
-    if (thisRecipe.Element === recipeElement) {
+    if (thisRecipe.element === recipeElement) {
       removeRecipe(thisRecipe);
       break;
     }
@@ -201,34 +308,6 @@ function removeRecipeByElement(recipeElement) {
 function onRemoveRecipe(event) {
   if (!event || !event.target) { return; }
   removeRecipeByElement(event.target.parentNode.parentNode);
-}
-
-function updateRecipeElement(recipe) {
-  if (!recipe.Element) { return; }
-  const recipeFields = recipe.Element.querySelectorAll(".recipe-field");
-  // Count
-  recipeFields[0].textContent = recipe.Count+"x";
-  // Name
-  recipeFields[1].textContent = recipe.Name || "<CUSTOM>";
-  // Completion
-  recipeFields[2].textContent = "("+Math.floor(recipe.Completed/recipe.Multiplier)+"/"+recipe.CraftCount+")";
-  // Multiplier
-  if (recipe.Multiplier === 1) {
-    recipeFields[3].style.display = "none";
-  } else if (recipeFields[3].style.display === "none") {
-    recipeFields[3].style.display = "block";
-  }
-  recipeFields[3].textContent = "("+recipe.Multiplier+"x/Craft)";
-  // Class
-  recipeFields[4].textContent = recipe.Class;
-
-  // Have
-  const haveInput = recipe.Element.querySelector(".recipe-have");
-  haveInput.value = recipe.Completed;
-}
-
-function updateRecipe(recipe) {
-  updateRecipeElement(recipe);
 }
 
 let newMaterials = [];
