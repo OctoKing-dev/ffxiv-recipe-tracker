@@ -240,6 +240,7 @@ class Material {
     } 
     this.#name = newName.toString();
     this.updateElement();
+    this.updateTimeElement();
   }
 
   get count() {
@@ -380,6 +381,40 @@ class Material {
     haveInput.value = this.#completed;
   }
 
+  createTimeElement() {
+    if (this.#timeElement) {
+      this.#timeElement.remove();
+      this.#timeElement = null;
+    }
+
+    // Don't create a timeElement if it isn't time-gated.
+    if (!this.#timeElement && (!this.#time || this.#time === "")) {
+      return;
+    }
+
+    // Create Timed Material List entry from template
+    const timedMaterialTemplate = document.getElementById("timedMaterialTemplate");
+    const newTimedMaterialTemplate = timedMaterialTemplate.content.firstElementChild.cloneNode(true);
+
+    this.#timeElement = newTimedMaterialTemplate;
+    this.updateTimeElement();
+  }
+
+  updateTimeElement() {
+    if (!this.#timeElement) {
+      return;
+    }
+    const fields = this.#timeElement.querySelectorAll(".material-field");
+    // Name
+    fields[0].textContent = this.#name;
+    // Class
+    fields[1].textContent = this.#craftClass;
+    // Location
+    fields[2].textContent = this.#location;
+    // Time
+    fields[3].textContent = this.#time;
+  }
+
   addMaterial(newMaterial, amountPerCraft = 1) {
     if (!newMaterial || amountPerCraft < 1) { return; }
     for (const material of this.#materials) {
@@ -478,12 +513,17 @@ function createMaterialFromNewMaterial(newMaterial) {
   // Create a new Material
   const material = new Material(newMaterial.Name, newMaterial.Multiplier, newMaterial.Class, newMaterial.Location, newMaterial.Time);
   material.createElement();
+  material.createTimeElement();
 
   Materials.push(material);
 
   console.log(material);
 
   document.getElementById("materialList").appendChild(material.element);
+
+  if (material.timeElement) {
+    document.getElementById("timerList").appendChild(material.timeElement);
+  }
 
   return material;
 }
