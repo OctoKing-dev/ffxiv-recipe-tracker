@@ -1,6 +1,47 @@
 const Recipes = [];
 const Materials = [];
-const RawMaterials = [];
+
+class Recipe {
+  #name = "";
+  #count = 1;
+  #completed = 0;
+  #craftClass = "";
+  #craftCount = 1;
+  #materials = [];
+  #multiplier = 1;
+
+  get name() {
+    return this.#name;
+  }
+  set name(newName) {
+    this.#name = newName;
+  }
+
+  get count() {
+    return this.#count;
+  }
+  
+  get completed() {
+    return this.#completed;
+  }
+
+  get class() {
+    return this.#craftClass;
+  }
+
+  get craftCount() {
+    return this.#craftCount;
+  }
+
+  get materials() {
+    return this.#materials;
+  }
+
+  get multiplier() {
+    return this.#multiplier;
+  }
+}
+
 
 const newRecipeName = document.getElementById("newRecipeName"),
   newRecipeCount = document.getElementById("newRecipeCount"),
