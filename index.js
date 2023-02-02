@@ -249,7 +249,7 @@ class Material {
     return this.#completed;
   }
 
-  get class() {
+  get craftClass() {
     return this.#craftClass;
   }
 
