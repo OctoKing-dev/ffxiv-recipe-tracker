@@ -14,7 +14,7 @@ class Recipe {
     return this.#name;
   }
   set name(newName) {
-    this.#name = newName;
+    this.#name = newName || "";
   }
 
   get count() {
@@ -39,6 +39,71 @@ class Recipe {
 
   get multiplier() {
     return this.#multiplier;
+  }
+}
+
+class Material {
+  #name = "";
+  #count = 1;
+  #completed = 0;
+  #craftClass = "";
+  #craftCount = "";
+  #location = "";
+  #multiplier = 1;
+  #time = "";
+  #timeAMPM = false;
+
+  constructor(name) {
+    if (!name || name === "") {
+      error("Material: Attempted to create Material with invalid or blank name!");
+    }
+    this.#name = name;
+  }
+
+  get name() {
+    return this.#name;
+  }
+  set name(newName) {
+    if (!newName || newName === "") {
+      error("Material: Attempted to set invalid or blank name!");
+    } 
+    this.#name = newName;
+  }
+
+  get count() {
+    return this.#count;
+  }
+  
+  get completed() {
+    return this.#completed;
+  }
+
+  get class() {
+    return this.#craftClass;
+  }
+
+  get craftCount() {
+    return this.#craftCount;
+  }
+  
+  get location() {
+    return this.#location;
+  }
+
+  get materials() {
+    return this.#materials;
+  }
+
+  get multiplier() {
+    return this.#multiplier;
+  }
+
+  get time() {
+    return this.#time;
+  }
+
+  get timeAMPM() {
+    return this.#timeAMPM;
   }
 }
 
