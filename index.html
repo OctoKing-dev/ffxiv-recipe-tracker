@@ -92,8 +92,13 @@
             <input type="text" list="locationDataList" id="newMaterialLocation" name="newMaterialLocation">
           </div>
           <div class="input-group">
-            <label for="newMaterialTime">Time</label>
+            <label for="newMaterialTime">Time Start</label>
             <input type="time" id="newMaterialTime" name="newMaterialTime">
+            -
+            <label for="newMaterialTimeEnd">End</label>
+            <input type="time" id="newMaterialTimeEnd" name="newMaterialTimeEnd">
+            <label for="newMaterialTimeAMPM">AM+PM?</label>
+            <input type="checkbox" id="newMaterialTimeAMPM">
           </div>
         </div>
         <div id="newMaterialList" class="container material-list">
@@ -111,6 +116,7 @@
               <span class="material-class material-field">CRP</span>
               <span class="material-location material-field">Limsa Lominsa</span>
               <span class="material-time material-field">16:00</span>
+              <span class="material-field">AM/PM</span>
               <div class="buttons">
                 <button type="button" class="remove-button">Remove</button>
               </div>
@@ -160,8 +166,15 @@
                 </label>
               </div>
               <div class="input-group">
-                <label>Time
+                <label>Time Start
                   <input type="time" class="submaterial-control" name="newMaterialTime">
+                </label>
+                -
+                <label>End
+                  <input type="time" class="submaterial-control" name="newMaterialTimeEnd">
+                </label>
+                <label>AM/PM?
+                  <input type="checkbox" class="submaterial-control" name="newMaterialAMPM">
                 </label>
               </div>
               <button type="button" class="close-button">X</button>
@@ -186,7 +199,10 @@
           <span class="material-name material-field">EXAMPLE</span>
           <span class="material-class material-field">CRP</span>
           <span class="material-location material-field">Limsa Lominsa</span>
-          <span class="material-time material-field">16:00</span>
+          <div class="material-time-container">
+            <span class="material-time material-field">00:00</span>
+            <span class="material-time material-field"></span>
+          </div>
         </div>        
       </template>
     </div>

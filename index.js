@@ -214,12 +214,15 @@ class Material {
   #location = "";
   #materials = [];
   #multiplier = 1;
-  #time = "";
+  #timeStart = "";
+  #timeEnd = "";
+  #timeStart2 = "";
+  #timeEnd2 = "";
   #timeAMPM = false;
   #element = null;
   #timeElement = null;
 
-  constructor(name, multiplier = 1, craftClass = "", location = "", time = "", timeAMPM = false) {
+  constructor(name, multiplier = 1, craftClass = "", location = "", timeStart = "", timeEnd = "", timeAMPM = false) {
     if (!name || name === "") {
       error("Material: Attempted to create Material with invalid or blank name!");
     }
@@ -227,8 +230,9 @@ class Material {
     this.#multiplier = (multiplier > 0) ? multiplier : 1;
     this.#craftClass = craftClass.toString();
     this.#location = location.toString();
-    this.#time = time.toString();
     this.#timeAMPM = (timeAMPM == true);
+    this.timeStart = timeStart.toString();
+    this.timeEnd = timeEnd.toString();
   }
 
   get name() {
@@ -290,12 +294,36 @@ class Material {
     return this.#multiplier;
   }
 
-  get time() {
-    return this.#time;
+  get timeStart() {
+    return this.#timeStart;
+  }
+  set timeStart(value = "") {
+    this.#timeStart = value;
+    if (this.#timeAMPM) {
+      this.#timeStart2 = this.#getFlippedTime(value);
+    } else {
+      this.#timeStart2 = "";
+    }
+  }
+
+  get timeEnd() {
+    return this.#timeEnd;
+  }
+  set timeEnd(value = "") {
+    this.#timeEnd = value;
+    if (this.#timeAMPM) {
+      this.#timeEnd2 = this.#getFlippedTime(value);
+    } else {
+      this.#timeEnd2 = "";
+    }
   }
 
   get timeAMPM() {
     return this.#timeAMPM;
+  }
+  set timeAMPM(value = false) {
+    this.#timeStart2 = (value) ? this.#getFlippedTime(this.#timeStart) : "";
+    this.#timeEnd2 = (value) ? this.#getFlippedTime(this.#timeEnd) : "";
   }
 
   calculateCraftCount() {
@@ -372,7 +400,10 @@ class Material {
     // Location
     fields[4].textContent = this.#location;
     // Time
-    fields[5].textContent = this.#time;
+    fields[5].textContent = this.#timeStart + (this.#timeEnd != "" ? " - " + this.#timeEnd : "");
+    if (this.#timeStart != "" && this.#timeEnd != "" && this.#timeAMPM) {
+      fields[5].textContent += " | " + this.#timeStart2 + " - " + this.#timeEnd2;
+    }
     // Completion
     fields[6].textContent = "("+Math.floor(this.#completed/this.#multiplier)+"/"+this.#craftCountTotal+")";
 
@@ -388,7 +419,7 @@ class Material {
     }
 
     // Don't create a timeElement if it isn't time-gated.
-    if (!this.#timeElement && (!this.#time || this.#time === "")) {
+    if (!this.#timeElement && (!this.#timeStart || this.#timeStart === "")) {
       return;
     }
 
@@ -412,7 +443,24 @@ class Material {
     // Location
     fields[2].textContent = this.#location;
     // Time
-    fields[3].textContent = this.#time;
+    fields[3].textContent = this.#timeStart + (this.#timeEnd != "" ? "-" + this.#timeEnd : "");
+    // FlippedTime
+    if (this.#timeAMPM) {
+      fields[4].textContent = this.#timeStart2 + (this.#timeEnd2 != "" ? "-" + this.#timeEnd2 : "");
+    } else {
+      console.log("False");
+    }
+  }
+
+  #getFlippedTime(time) {
+    if (!time || time === "") { return ""; }
+    const regex = /(\d\d):(\d\d)/;
+    const newTime = regex.exec(time);
+    
+    if (!newTime || !newTime[1] || !newTime[2]) { return ""; }
+
+    const flippedHour = (Number(newTime[1]) + 12 % 24);
+    return (flippedHour.toString().padStart(2,"0") + ":" + newTime[2]);
   }
 
   addMaterial(newMaterial, amountPerCraft = 1) {
@@ -511,7 +559,7 @@ function createMaterialFromNewMaterial(newMaterial) {
   }
 
   // Create a new Material
-  const material = new Material(newMaterial.Name, newMaterial.Multiplier, newMaterial.Class, newMaterial.Location, newMaterial.Time);
+  const material = new Material(newMaterial.Name, newMaterial.Multiplier, newMaterial.Class, newMaterial.Location, newMaterial.TimeStart, newMaterial.TimeEnd, newMaterial.TimeAMPM);
   material.createElement();
   material.createTimeElement();
 
@@ -545,7 +593,9 @@ const newMaterialName = document.getElementById("newMaterialName"),
   newMaterialMultiplier = document.getElementById("newMaterialMultiplier"),
   newMaterialClass = document.getElementById("newMaterialClass"),
   newMaterialLocation = document.getElementById("newMaterialLocation"),
-  newMaterialTime = document.getElementById("newMaterialTime");
+  newMaterialTime = document.getElementById("newMaterialTime"),
+  newMaterialTimeEnd = document.getElementById("newMaterialTimeEnd"),
+  newMaterialTimeAMPM = document.getElementById("newMaterialTimeAMPM");
 
 function clearMaterialInput() {
   newMaterialName.value = "";
@@ -554,6 +604,8 @@ function clearMaterialInput() {
   newMaterialClass.value = "";
   newMaterialLocation.value = "";
   newMaterialTime.value = "";
+  newMaterialTimeEnd.value = "";
+  newMaterialTimeAMPM.checked = false;
 }
 
 function createNewMaterial(name) {
@@ -565,7 +617,9 @@ function createNewMaterial(name) {
   newMaterial.Class = "";
   newMaterial.Materials = [];
   newMaterial.Location = "";
-  newMaterial.Time = "";
+  newMaterial.TimeStart = "";
+  newMaterial.TimeEnd = "";
+  newMaterial.TimeAMPM = false;
 
   return newMaterial;
 }
@@ -578,6 +632,8 @@ function clearSubMaterialInput(fieldList) {
   fieldList[3].value = "";
   fieldList[4].value = "";
   fieldList[5].value = "";
+  fieldList[6].value = "";
+  fieldList[7].checked = false;
 }
 
 function addNewSubMaterial(event, parentMaterial) {
@@ -597,8 +653,12 @@ function addNewSubMaterial(event, parentMaterial) {
   newMaterial.Class = controlFields[3].value;
   // Location
   newMaterial.Location = controlFields[4].value;
-  // Time
-  newMaterial.Time = controlFields[5].value;
+  // TimeStart
+  newMaterial.TimeStart = controlFields[5].value;
+  // TimeEnd
+  newMaterial.TimeEnd = controlFields[6].value;
+  // TimeAMPM
+  newMaterial.TimeAMPM = controlFields[7].value;
 
   // Try to add it to our parentMaterial
   addNewMaterial(newMaterial, parentMaterial);
@@ -616,7 +676,9 @@ function addNewMaterial(newMaterial, parentMaterial) {
     newMaterial.Multiplier = Number.parseInt(newMaterialMultiplier.value) || 1;
     newMaterial.Class = newMaterialClass.value;
     newMaterial.Location = newMaterialLocation.value;
-    newMaterial.Time = newMaterialTime.value; 
+    newMaterial.TimeStart = newMaterialTime.value; 
+    newMaterial.TimeEnd = newMaterialTimeEnd.value;
+    newMaterial.TimeAMPM = newMaterialTimeAMPM.checked;
   }
 
   let existingMaterial = false;
@@ -628,7 +690,9 @@ function addNewMaterial(newMaterial, parentMaterial) {
       newMaterial.Multiplier = material.multiplier;
       newMaterial.Class = material.craftClass;
       newMaterial.Location = material.location;
-      newMaterial.Time = material.time;
+      newMaterial.TimeStart = material.timeStart;
+      newMaterial.TimeEnd = material.timeEnd;
+      newMaterial.TImeAMPM = material.timeAMPM;
       console.log("Preexisting Material entered!");
       console.log(newMaterial);
 
@@ -643,7 +707,9 @@ function addNewMaterial(newMaterial, parentMaterial) {
       material.Multiplier = newMaterial.Multiplier;
       material.Class = newMaterial.Class;
       material.Location = newMaterial.Location;
-      material.Time = newMaterial.Time;
+      material.TimeStart = newMaterial.TimeStart;
+      material.TimeEnd = newMaterial.TimeEnd;
+      material.TimeAMPM = newMaterial.TimeAMPM;
 
       console.log(newMaterial);
       updateNewMaterialElement(material);
@@ -660,7 +726,9 @@ function addNewMaterial(newMaterial, parentMaterial) {
         material[0].Multiplier = newMaterial.Multiplier;
         material[0].Class = newMaterial.Class;
         material[0].Location = newMaterial.Location;
-        material[0].Time = newMaterial.Time;
+        material[0].TimeStart = newMaterial.TimeStart;
+        material[0].TimeEnd = newMaterial.TimeEnd;
+        material[0].TimeAMPM = newMaterial.TimeAMPM;
 
         console.log(newMaterial);
         updateNewMaterialElement(material[0]);
@@ -674,10 +742,12 @@ function addNewMaterial(newMaterial, parentMaterial) {
     for (const material of uniqueNewMaterials) {
       if (newMaterial.Name === material.Name) {
         // Copy from unique material on match. This is in case we've defined the material, but in a sub-material.
-        newMaterial.Multiplier = material.multiplier;
-        newMaterial.Class = material.craftClass;
-        newMaterial.Location = material.location;
-        newMaterial.Time = material.time;
+        newMaterial.Multiplier = material.Multiplier;
+        newMaterial.Class = material.Class;
+        newMaterial.Location = material.Location;
+        newMaterial.TimeStart = material.TimeStart;
+        newMaterial.TimeEnd = material.TimeEnd;
+        newMaterial.TimeAMPM = material.TimeAMPM;
         console.log("Preexisting Material entered!");
         console.log(newMaterial);
 
@@ -705,7 +775,10 @@ function addNewMaterial(newMaterial, parentMaterial) {
   // Location
   templateFields[4].textContent = newMaterial.Location;
   // Time
-  templateFields[5].textContent = newMaterial.Time;
+  templateFields[5].textContent = newMaterial.TimeStart;
+  templateFields[5].textContent += (newMaterial.TimeEnd != "") ? " - " + newMaterial.TimeEnd : "";
+  // TimeAMPM
+  templateFields[6].textContent = (newMaterial.TimeAMPM) ? "AM/PM" : "";
 
   // Save a reference to our new Element
   newMaterial.Element = newMaterialTemplate;
@@ -788,7 +861,10 @@ function updateNewMaterialElement(newMaterial) {
   // Location
   newMaterialFields[4].textContent = newMaterial.Location;
   // Time
-  newMaterialFields[5].textContent = newMaterial.Time;
+  newMaterialFields[5].textContent = newMaterial.TimeStart;
+  newMaterialFields[5].textContent += (newMaterial.TimeEnd != "") ? " - " + newMaterial.TimeEnd : "";
+  // TimeAMPM
+  newMaterialFields[6].textContent = (newMaterial.TimeAMPM) ? "AM/PM" : "";
 }
 
 const addRecipePanel = document.getElementById("addRecipePanel");
