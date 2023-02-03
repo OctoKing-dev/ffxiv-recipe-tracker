@@ -65,7 +65,8 @@ main {
 }
 
 .recipe-controls,
-.material-controls {
+.material-controls,
+.submaterial-controls {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -94,6 +95,19 @@ main {
 .recipes, 
 .timers {
   flex: 1;
+}
+
+.submaterial-controls,
+.submaterial-list {
+  margin-left: 16px;
+}
+
+.hidden {
+  display: none;
+}
+
+.list-empty {
+  display: none;
 }
 
 #addRecipe {

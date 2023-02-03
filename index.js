@@ -517,6 +517,11 @@ function createMaterialFromNewMaterial(newMaterial) {
 
   Materials.push(material);
 
+  for (const subMaterialArray of newMaterial.Materials) {
+    const subMaterial = createMaterialFromNewMaterial(subMaterialArray[0]);
+    material.addMaterial(subMaterial, subMaterialArray[1]);
+  }
+
   console.log(material);
 
   if (material.materials.length > 0) {
@@ -533,6 +538,7 @@ function createMaterialFromNewMaterial(newMaterial) {
 }
 
 let newMaterials = [];
+let uniqueNewMaterials = [];
 
 const newMaterialName = document.getElementById("newMaterialName"),
   newMaterialCount = document.getElementById("newMaterialCount"),
@@ -550,19 +556,70 @@ function clearMaterialInput() {
   newMaterialTime.value = "";
 }
 
+function createNewMaterial(name) {
+  const newMaterial = {};
+  newMaterial.Name = name || "";
+  if (newMaterial.Name === "") { return null; } // Can't have nameless Materials.
+  newMaterial.Count = 1;
+  newMaterial.Multiplier = 1;
+  newMaterial.Class = "";
+  newMaterial.Materials = [];
+  newMaterial.Location = "";
+  newMaterial.Time = "";
+
+  return newMaterial;
+}
+
+function clearSubMaterialInput(fieldList) {
+  if (!fieldList) { return; }
+  fieldList[0].value = "";
+  fieldList[1].value = "1";
+  fieldList[2].value = "1";
+  fieldList[3].value = "";
+  fieldList[4].value = "";
+  fieldList[5].value = "";
+}
+
+function addNewSubMaterial(event, parentMaterial) {
+  if (!event || !parentMaterial) { return; }
+  const controlFields = event.target.parentNode.querySelectorAll(".submaterial-control");
+  if (!controlFields) { return; }
+
+  // Try to get a newMaterial using our Name input.
+  const newMaterial = createNewMaterial(controlFields[0].value);
+  if (!newMaterial) { return; }
+
+  // Count
+  newMaterial.Count = Number.parseInt(controlFields[1].value) || 1;
+  // Multiplier
+  newMaterial.Multiplier = Number.parseInt(controlFields[2].value) || 1;
+  // Class
+  newMaterial.Class = controlFields[3].value;
+  // Location
+  newMaterial.Location = controlFields[4].value;
+  // Time
+  newMaterial.Time = controlFields[5].value;
+
+  // Try to add it to our parentMaterial
+  addNewMaterial(newMaterial, parentMaterial);
+
+  clearSubMaterialInput(controlFields);
+}
+
 const addMaterialButton = document.getElementById("addMaterial");
 /** Adds new material to the new recipe being worked on, based on values entered. */
-function addNewMaterial() {
-  const newMaterial = {};
-  newMaterial.Name = newMaterialName.value || "";
-  if (newMaterial.Name === "") { return; } // Can't have nameless Materials.
-  newMaterial.Count = Number.parseInt(newMaterialCount.value) || 1;
-  newMaterial.Multiplier = Number.parseInt(newMaterialMultiplier.value) || 1;
-  newMaterial.Class = newMaterialClass.value;
-  newMaterial.Materials = [];
-  newMaterial.Location = newMaterialLocation.value;
-  newMaterial.Time = newMaterialTime.value;
+function addNewMaterial(newMaterial, parentMaterial) {
+  if (!newMaterial) {
+    newMaterial = createNewMaterial(newMaterialName.value);
+    if (!newMaterial) { return; }
+    newMaterial.Count = Number.parseInt(newMaterialCount.value) || 1;
+    newMaterial.Multiplier = Number.parseInt(newMaterialMultiplier.value) || 1;
+    newMaterial.Class = newMaterialClass.value;
+    newMaterial.Location = newMaterialLocation.value;
+    newMaterial.Time = newMaterialTime.value; 
+  }
 
+  let existingMaterial = false;
   for (const material of Materials) {
     // On match, assume we just want more of the same Material without updating.
     // This allows us to add more of a Material simply by entering its Name and Count.
@@ -574,12 +631,14 @@ function addNewMaterial() {
       newMaterial.Time = material.time;
       console.log("Preexisting Material entered!");
       console.log(newMaterial);
+
+      existingMaterial = true;
     }
   }
 
   for (const material of newMaterials) {
     // Update on matches. Assume they meant to make a correction to the New Material.
-    if (newMaterial.Name === material.Name) {
+    if (newMaterial.Name === material.Name && !parentMaterial) {
       material.Count = newMaterial.Count;
       material.Multiplier = newMaterial.Multiplier;
       material.Class = newMaterial.Class;
@@ -593,8 +652,39 @@ function addNewMaterial() {
     }
   }
 
-  newMaterials.push(newMaterial);
-  console.log(newMaterial);
+  if (parentMaterial) {
+    for (const material of parentMaterial.Materials) {
+      if (newMaterial.Name === material[0].Name) {
+        // Update on matches. Assume they meant to make a correction to the New Sub-Material.
+        material[0].Count = newMaterial.Count;
+        material[0].Multiplier = newMaterial.Multiplier;
+        material[0].Class = newMaterial.Class;
+        material[0].Location = newMaterial.Location;
+        material[0].Time = newMaterial.Time;
+
+        console.log(newMaterial);
+        updateNewMaterialElement(material[0]);
+        clearMaterialInput();
+        return;
+      }
+    }
+  }
+
+  if (!existingMaterial) {
+    for (const material of uniqueNewMaterials) {
+      if (newMaterial.Name === material.Name) {
+        // Copy from unique material on match. This is in case we've defined the material, but in a sub-material.
+        newMaterial.Multiplier = material.multiplier;
+        newMaterial.Class = material.craftClass;
+        newMaterial.Location = material.location;
+        newMaterial.Time = material.time;
+        console.log("Preexisting Material entered!");
+        console.log(newMaterial);
+
+        existingMaterial = true;
+      }
+    }
+  }
 
   // Create New Material List entry from template
   const materialTemplate = document.getElementById("newMaterialTemplate");
@@ -620,11 +710,57 @@ function addNewMaterial() {
   // Save a reference to our new Element
   newMaterial.Element = newMaterialTemplate;
 
-  document.getElementById("newMaterialList").append(newMaterialTemplate);
+  // Rig up Add Material button to reveal Submaterial Controls
+  const addButton = newMaterialTemplate.querySelector(".add-button");
+  addButton.addEventListener('click', (event) => {
+    if (!event.target) { return; }
+    const submaterialControls = event.target.parentNode.parentNode.parentNode.querySelector(".submaterial-controls");
+    if (submaterialControls) {
+      submaterialControls.classList.remove("hidden")
+    }
+  });
+
+  // Rig up Submaterial Controls' close button
+  const submaterialCloseButton = newMaterialTemplate.querySelector(".close-button");
+  submaterialCloseButton.addEventListener('click', (event) => {
+    if (!event.target) { return; }
+    const submaterialControls = event.target.parentNode;
+    submaterialControls.classList.add("hidden");
+  });
+
+  // Rig up Submaterial Controls' Add button to work recursively
+  const submaterialAddButton = newMaterialTemplate.querySelector(".submaterial-controls .add-button");
+  submaterialAddButton.addEventListener('click', (event) => { addNewSubMaterial(event, newMaterial); });
+
+  console.log(newMaterial);
 
   clearMaterialInput();
+
+  if (parentMaterial) {
+    const newMaterialArray = [
+      newMaterial,
+      newMaterial.Count
+    ];
+    parentMaterial.Materials.push(newMaterialArray);
+    if (parentMaterial.Element) {
+      const parentMaterialList = parentMaterial.Element.querySelector(".material-list");
+      if (parentMaterialList) {
+        parentMaterialList.append(newMaterialTemplate);
+        if (parentMaterialList.classList.contains("list-empty")) {
+          parentMaterialList.classList.remove("list-empty");
+        }
+      }
+    }
+  } else {
+    newMaterials.push(newMaterial);
+    document.getElementById("newMaterialList").append(newMaterialTemplate);
+  }
+
+  if (!existingMaterial) {
+    uniqueNewMaterials.push(newMaterial);
+  }
 }
-addMaterialButton.addEventListener('click', addNewMaterial);
+addMaterialButton.addEventListener('click', (event) => { addNewMaterial(); });
 
 function clearNewMaterials() {
   for (const newMaterial of newMaterials) {
@@ -634,6 +770,7 @@ function clearNewMaterials() {
     }
   }
   newMaterials = [];
+  uniqueNewMaterials = [];
 }
 
 function updateNewMaterialElement(newMaterial) {

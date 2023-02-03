@@ -100,18 +100,74 @@
           
         </div>
         <template id="newMaterialTemplate">
-          <div class="container new-material-item">
-            <div class="buttons">
-              <button type="button" class="add-button">+ Add Material</button>
+          <div class="container">
+            <div class="container new-material-item">
+              <div class="buttons">
+                <button type="button" class="add-button">+ Add Sub-Material</button>
+              </div>
+              <span class="material-count material-field">1x</span>
+              <span class="material-name material-field">EXAMPLE</span>
+              <span class="material-multiplier material-field">(3x/Craft)</span>
+              <span class="material-class material-field">CRP</span>
+              <span class="material-location material-field">Limsa Lominsa</span>
+              <span class="material-time material-field">16:00</span>
+              <div class="buttons">
+                <button type="button" class="remove-button">Remove</button>
+              </div>
             </div>
-            <span class="material-count material-field">1x</span>
-            <span class="material-name material-field">EXAMPLE</span>
-            <span class="material-multiplier material-field">(3x/Craft)</span>
-            <span class="material-class material-field">CRP</span>
-            <span class="material-location material-field">Limsa Lominsa</span>
-            <span class="material-time material-field">16:00</span>
-            <div class="buttons">
-              <button type="button" class="remove-button">Remove</button>
+            <div class="container submaterial-controls hidden">
+              <button type="button" class="add-button">+ Add</button>
+              <div class="input-group">
+                <label>Name
+                  <input type="text" class="submaterial-control" name="newMaterialName" required>
+                </label>
+              </div>
+              <div class="input-group">
+                <label>Count
+                  <input type="number" class="submaterial-control" name="newMaterialCount" value="1" min="1" max="9999" required>
+                </label>
+              </div>
+              <div class="input-group">
+                <label># per Craft
+                  <input type="number" class="submaterial-control" name="newMaterialMultiplier" value="1" min="1" max="999" required>
+                </label>
+              </div>
+              <div class="input-group">
+                <label>Class 
+                  <select class="submaterial-control" name="newMaterialClass">
+                    <option value="">---</option>
+                    <optgroup label="DoH">
+                      <option value="CRP">CRP</option>
+                      <option value="BSM">BSM</option>
+                      <option value="ARM">ARM</option>
+                      <option value="GSM">GSM</option>
+                      <option value="LTW">LTW</option>
+                      <option value="WVR">WVR</option>
+                      <option value="ALC">ALC</option>
+                      <option value="CUL">CUL</option>
+                    </optgroup>
+                    <optgroup label="DoL">
+                      <option value="MIN">MIN</option>
+                      <option value="BTN">BTN</option>
+                      <option value="FSH">FSH</option>
+                    </optgroup>
+                  </select>
+                </label>
+              </div>
+              <div class="input-group">
+                <label>Location
+                  <input type="text" class="submaterial-control" name="newMaterialLocation">
+                </label>
+              </div>
+              <div class="input-group">
+                <label>Time
+                  <input type="time" class="submaterial-control" name="newMaterialTime">
+                </label>
+              </div>
+              <button type="button" class="close-button">X</button>
+            </div>
+            <div class="container material-list submaterial-list list-empty">
+
             </div>
           </div>
         </template>
