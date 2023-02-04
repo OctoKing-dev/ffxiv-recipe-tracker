@@ -724,7 +724,7 @@ function addNewSubMaterial(event, parentMaterial) {
   // TimeEnd
   newMaterial.TimeEnd = controlFields[6].value;
   // TimeAMPM
-  newMaterial.TimeAMPM = controlFields[7].value;
+  newMaterial.TimeAMPM = controlFields[7].checked;
 
   // Try to add it to our parentMaterial
   addNewMaterial(newMaterial, parentMaterial);
@@ -758,7 +758,7 @@ function addNewMaterial(newMaterial, parentMaterial) {
       newMaterial.Location = material.location;
       newMaterial.TimeStart = material.timeStart;
       newMaterial.TimeEnd = material.timeEnd;
-      newMaterial.TImeAMPM = material.timeAMPM;
+      newMaterial.TimeAMPM = material.timeAMPM;
       console.log("Preexisting Material entered!");
       console.log(newMaterial);
 
