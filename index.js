@@ -521,6 +521,38 @@ class Material {
   }
 }
 
+let Collator = new Intl.Collator();
+
+function addElementToSortedList(element, listEle) {
+  if (!element || !listEle) { return; }
+  
+  const sortType = listEle.getAttribute("data-sortType");
+  if (!sortType || sortType === "") {
+    listEle.appendChild(element); // Unsorted list
+    return;
+  }
+
+  if (sortType === "alphabetical") {
+    switch(listEle.id) {
+      case "timerList":
+      case "materialList":
+      case "rawMaterialList":
+        for (const other of listEle.children) {
+          const compare = Collator.compare(element.querySelector(".material-name").textContent, other.querySelector(".material-name").textContent);
+          if (compare < 0) {
+            listEle.insertBefore(element, other);
+            return;
+          }
+        }
+        listEle.appendChild(element);
+        break;
+      default:
+        listEle.appendChild(element);
+    }
+  }
+
+  listEle.appendChild(element);
+}
 
 const newRecipeName = document.getElementById("newRecipeName"),
   newRecipeCount = document.getElementById("newRecipeCount"),
@@ -607,13 +639,13 @@ function createMaterialFromNewMaterial(newMaterial) {
   console.log(material);
 
   if (material.materials.length > 0) {
-    document.getElementById("materialList").appendChild(material.element);
+    addElementToSortedList(material.element, document.getElementById("materialList"));
   } else {
-    document.getElementById("rawMaterialList").appendChild(material.element);
+    addElementToSortedList(material.element, document.getElementById("rawMaterialList"));
   }
 
   if (material.timeElement) {
-    document.getElementById("timerList").appendChild(material.timeElement);
+    addElementToSortedList(material.timeElement, document.getElementById("timerList"));
   }
 
   return material;
