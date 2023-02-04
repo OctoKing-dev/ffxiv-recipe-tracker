@@ -874,7 +874,11 @@ function addNewMaterial(newMaterial, parentMaterial) {
       if (!event.target) { return; }
       const submaterialControls = event.target.parentNode.parentNode.parentNode.querySelector(".submaterial-controls");
       if (submaterialControls) {
-        submaterialControls.classList.remove("hidden")
+        if (!submaterialControls.classList.contains("hidden")) {
+          submaterialControls.classList.add("hidden");
+        } else {
+          submaterialControls.classList.remove("hidden");
+        }
       }
     });
   }
