@@ -748,6 +748,7 @@ function addNewMaterial(newMaterial, parentMaterial) {
   }
 
   let existingMaterial = false;
+  let existingRealMaterial = false;
   for (const material of Materials) {
     // On match, assume we just want more of the same Material without updating.
     // This allows us to add more of a Material simply by entering its Name and Count.
@@ -763,12 +764,20 @@ function addNewMaterial(newMaterial, parentMaterial) {
       console.log(newMaterial);
 
       existingMaterial = true;
+      existingRealMaterial = true;
     }
   }
 
   for (const material of newMaterials) {
     // Update on matches. Assume they meant to make a correction to the New Material.
     if (newMaterial.Name === material.Name && !parentMaterial) {
+      if (existingRealMaterial) { // Unless it's actually a real Material, in which case we can only safely change the Count.
+        material.Count = newMaterial.Count;
+        console.log(newMaterial);
+        updateNewMaterialElement(material);
+        clearMaterialInput();
+        return;
+      }
       material.Count = newMaterial.Count;
       material.Multiplier = newMaterial.Multiplier;
       material.Class = newMaterial.Class;
@@ -786,8 +795,15 @@ function addNewMaterial(newMaterial, parentMaterial) {
 
   if (parentMaterial) {
     for (const material of parentMaterial.Materials) {
+      // Update on matches. Assume they meant to make a correction to the New Sub-Material.
       if (newMaterial.Name === material[0].Name) {
-        // Update on matches. Assume they meant to make a correction to the New Sub-Material.
+        if (existingRealMaterial) { // Unless it's actually a real Material, in which case we can only safely change the Count.
+          material[0].Count = newMaterial.Count;
+          console.log(newMaterial);
+          updateNewMaterialElement(material[0]);
+          clearMaterialInput();
+          return;
+        }
         material[0].Count = newMaterial.Count;
         material[0].Multiplier = newMaterial.Multiplier;
         material[0].Class = newMaterial.Class;
@@ -851,13 +867,17 @@ function addNewMaterial(newMaterial, parentMaterial) {
 
   // Rig up Add Material button to reveal Submaterial Controls
   const addButton = newMaterialTemplate.querySelector(".add-button");
-  addButton.addEventListener('click', (event) => {
-    if (!event.target) { return; }
-    const submaterialControls = event.target.parentNode.parentNode.parentNode.querySelector(".submaterial-controls");
-    if (submaterialControls) {
-      submaterialControls.classList.remove("hidden")
-    }
-  });
+  if (existingMaterial) {
+    addButton.classList.add("hidden"); // We shouldn't modify duplicates of Materials until a proper Edit solution is in place.
+  } else {
+    addButton.addEventListener('click', (event) => {
+      if (!event.target) { return; }
+      const submaterialControls = event.target.parentNode.parentNode.parentNode.querySelector(".submaterial-controls");
+      if (submaterialControls) {
+        submaterialControls.classList.remove("hidden")
+      }
+    });
+  }
 
   // Rig up Submaterial Controls' close button
   const submaterialCloseButton = newMaterialTemplate.querySelector(".close-button");
@@ -869,7 +889,9 @@ function addNewMaterial(newMaterial, parentMaterial) {
 
   // Rig up Submaterial Controls' Add button to work recursively
   const submaterialAddButton = newMaterialTemplate.querySelector(".submaterial-controls .add-button");
-  submaterialAddButton.addEventListener('click', (event) => { addNewSubMaterial(event, newMaterial); });
+  if (!existingMaterial) { // We shouldn't add subMaterials to duplicates of Materials until a proper Edit solution is in place.
+    submaterialAddButton.addEventListener('click', (event) => { addNewSubMaterial(event, newMaterial); });
+  }
 
   console.log(newMaterial);
 
