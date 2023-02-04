@@ -41,6 +41,10 @@ main {
   gap: 16px;
 }
 
+.material-item--completed {
+  background-color: limegreen;
+}
+
 .material-item {
   padding: 8px;
 }

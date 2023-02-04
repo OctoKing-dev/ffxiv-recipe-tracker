@@ -410,6 +410,40 @@ class Material {
     // Have
     const haveInput = this.#element.querySelector(".material-have");
     haveInput.value = this.#completed;
+
+    // Update color if completed (completed >= count)
+    if (this.#completed >= this.#count) {
+      if (!this.#element.classList.contains("material-item--completed")) {
+        this.#element.classList.add("material-item--completed");
+        if (this.#timeElement) {
+          this.#timeElement.classList.add("material-item--completed");
+        }
+      }
+    } else {
+      if (this.#element.classList.contains("material-item--completed")) {
+        this.#element.classList.remove("material-item--completed");
+        if (this.#timeElement) {
+          this.#timeElement.classList.remove("material-item--completed");
+        }
+      }
+    }
+
+    // Hide material if count is 0 and have 0
+    if (this.#completed === 0 && this.#count === 0) {
+      if (!this.#element.classList.contains("hidden")) {
+        this.#element.classList.add("hidden");
+        if (this.#timeElement) {
+          this.#timeElement.classList.add("hidden");
+        }
+      }
+    } else {
+      if (this.#element.classList.contains("hidden")) {
+        this.#element.classList.remove("hidden");
+        if (this.#timeElement) {
+          this.#timeElement.classList.remove("hidden");
+        }
+      }
+    }
   }
 
   createTimeElement() {
