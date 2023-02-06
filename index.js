@@ -183,6 +183,17 @@ class Recipe {
     // Have
     const haveInput = this.#element.querySelector(".recipe-have");
     haveInput.value = this.#completed;
+
+    // Update color if completed (completed >= count)
+    if (this.#completed >= this.#count) {
+      if (!this.#element.classList.contains("recipe-item--completed")) {
+        this.#element.classList.add("recipe-item--completed");
+      }
+    } else {
+      if (this.#element.classList.contains("recipe-item--completed")) {
+        this.#element.classList.remove("recipe-item--completed");
+      }
+    }
   }
 
   addMaterial(newMaterial, amountPerCraft = 1) {
