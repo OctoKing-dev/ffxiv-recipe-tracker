@@ -33,6 +33,10 @@ main {
   margin-top: 16px;
 }
 
+.material-completion {
+  margin-left: auto;
+}
+
 .material-item, 
 .new-material-item {
   display: flex;
