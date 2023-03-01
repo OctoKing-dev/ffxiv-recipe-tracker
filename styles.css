@@ -94,6 +94,10 @@ main {
   align-items: center;
 }
 
+.recipe-materials {
+  margin: 0.5em 0;
+}
+
 .recipe-name {
   margin: 0;
   text-align: center;

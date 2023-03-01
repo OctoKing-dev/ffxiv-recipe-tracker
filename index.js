@@ -154,6 +154,13 @@ class Recipe {
 
     this.element = newRecipeTemplate;
 
+    const materialList = newRecipeTemplate.querySelector(".recipe-materials");
+    for (const material of this.#materials) {
+      const li = document.createElement("li");
+      li.textContent = material[1]+"x "+material[0].name;
+      materialList.appendChild(li);
+    }
+
     const removeButton = newRecipeTemplate.querySelector(".remove-button");
     removeButton.addEventListener('click', onRemoveRecipe);
 
