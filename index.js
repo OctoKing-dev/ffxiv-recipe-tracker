@@ -581,7 +581,6 @@ function clearRecipeInput() {
   newRecipeName.value = "";
   newRecipeCount.value = "1";
   newRecipeMultiplier.value = "1";
-  newRecipeClass.value = "";
 }
 
 const addRecipeButton = document.getElementById("addRecipe");
