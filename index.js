@@ -725,7 +725,11 @@ function addNewSubMaterial(event, parentMaterial) {
   if (!controlFields) { return; }
 
   // Try to get a newMaterial using our Name input.
-  const newMaterial = createNewMaterial(controlFields[0].value);
+  const name = controlFields[0].value;
+  if (parentMaterial.Name === name) {
+    return; // Can't make a material a submaterial of itself.
+  }
+  const newMaterial = createNewMaterial(name);
   if (!newMaterial) { return; }
 
   // Count
