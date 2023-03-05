@@ -45,6 +45,11 @@ main {
   gap: 16px;
 }
 
+.material-item--available,
+.recipe-item--available {
+  background-color: yellow;
+}
+
 .material-item--completed, 
 .recipe-item--completed {
   background-color: limegreen;

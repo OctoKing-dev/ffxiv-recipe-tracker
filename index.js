@@ -200,6 +200,20 @@ class Recipe {
       if (this.#element.classList.contains("recipe-item--completed")) {
         this.#element.classList.remove("recipe-item--completed");
       }
+      if (this.#materials.length > 0) {
+        // Check if we have enough to craft at least once
+        let enoughToCraft = true;
+        for (const material of this.#materials) {
+          if (material[0].completed < material[1]) {
+            enoughToCraft = false;
+          }
+        }
+        if (enoughToCraft && !this.#element.classList.contains("recipe-item--available")) {
+          this.#element.classList.add("recipe-item--available");
+        } else if (!enoughToCraft && this.#element.classList.contains("recipe-item--available")) {
+          this.#element.classList.remove("recipe-item--available");
+        }
+      }
     }
   }
 
@@ -444,6 +458,20 @@ class Material {
           this.#timeElement.classList.remove("material-item--completed");
         }
       }
+      if (this.#materials.length > 0) {
+        // Check if we have enough to craft at least once
+        let enoughToCraft = true;
+        for (const material of this.#materials) {
+          if (material[0].completed < material[1]) {
+            enoughToCraft = false;
+          }
+        }
+        if (enoughToCraft && !this.#element.classList.contains("material-item--available")) {
+          this.#element.classList.add("material-item--available");
+        } else if (!enoughToCraft && this.#element.classList.contains("material-item--available")) {
+          this.#element.classList.remove("material-item--available");
+        }
+      }
     }
 
     // Hide material if count is 0 and have 0
@@ -459,6 +487,27 @@ class Material {
         this.#element.classList.remove("hidden");
         if (this.#timeElement) {
           this.#timeElement.classList.remove("hidden");
+        }
+      }
+    }
+
+    // Update any Recipe that relies on us
+    for (const recipe of Recipes) {
+      for (const material of recipe.materials) {
+        if (material[0] == this) {
+          recipe.updateElement();
+          break;
+        }
+      }
+    }
+
+    // Update any Material that relies on us
+    for (const material of Materials) {
+      if (material === this) { continue; }
+      for (const submaterial of material.materials) {
+        if (submaterial[0] == this) {
+          material.updateElement();
+          break;
         }
       }
     }
